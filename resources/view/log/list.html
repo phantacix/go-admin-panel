@@ -1,0 +1,112 @@
+{{define "log/list.html"}}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>操作日志</title>
+        {{template "head.html"}}
+    </head>
+    <body>
+
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <form class="layui-form" action="">
+            <div class="layui-card-body">
+                <div style="padding-bottom: 10px;">
+                    <table>
+                        <tr>
+                            <td colspan="3">
+                                <input id="accountName" type="text" name="title" required  lay-verify="required" placeholder="请输入账号名" autocomplete="off" class="layui-input">
+                            </td>
+                            <td>
+                                <button class="layui-btn layuiadmin-btn-list" data-type="batchdel" onclick="queryByAccountName()">查询</button>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+                <table id="LAY-app-content-list" lay-filter="LAY-app-content-list"></table>
+            </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        layui.config({
+            base: '/static/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index', 'table'], function () { //use('contlist') 则会加载static/modules/的js文件
+            let table = layui.table
+
+            table.render({
+                elem: "#LAY-app-content-list",
+                url: "data",  //加载json数据
+                cols: [[
+                    {
+                        field: "id",
+                        width: 100,
+                        title: "操作ID"
+                    }, {
+                        field: "accountId",
+                        title: "用户ID",
+                        minWidth: 100
+                    }, {
+                        field: "method",
+                        title: "执行方法"
+                    }, {
+                        field: "path",
+                        title: "执行路径"
+                    }, {
+                        field: "params",
+                        title: "请求参数"
+                    }, {
+                        field: "ip",
+                        title: "访问ip"
+                    }]],
+                page: !0,
+                limit: 10,
+                limits: [10, 15, 20, 25, 30],
+                text: "对不起，加载出现异常！"
+            });
+
+            table.on("tool(LAY-app-content-list)", function (t) {
+                let e = t.data;
+                alert()
+                if ("del" === t.event) {
+                    layer.confirm("确定删除吗？", function (e) {
+                        t.del(), layer.close(e)
+                    })
+                }
+            });
+        });
+
+        function queryByAccountName() {
+            let accountName = document.getElementById("accountName")
+            alert(accountName.value)
+            $.ajax({
+                url:"list/accountName",
+                type:'post',
+                data:{
+                    accountName : accountName.value
+                },
+                success:function(data){
+                    alert(data)
+                    if(data.status == 'error'){
+                        layer.msg(data.msg,{icon: 5});//失败的表情
+                        return;
+                    }else if(data.status == 'success'){
+                        layer.msg(data.msg, {
+                            icon: 6,//成功的表情
+                            time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                        }, function(){
+                            location.reload();
+                        });
+                    }
+                },
+            });
+        }
+    </script>
+
+    </body>
+    </html>
+{{end}}

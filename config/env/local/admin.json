@@ -1,0 +1,61 @@
+{
+  "debug": true,
+  "gin": {
+    "view": "resources/view/",
+    "staticRelativePath": "/static",
+    "staticRootPath": "resources/static/",
+    "favicon": "favicon.ico",
+    "faviconPath": "resources/static/favicon.ico",
+    "url": "http://localhost",
+    "port": 80
+  },
+  "logger": {
+    "path": "logs/",
+    "suffix": ".log",
+    "level": "debug",
+    "isWriteFile": false,
+    "maxAge": 7,
+    "rotationHour": 1
+  },
+  "mysql": [
+    {
+      "enable": true,
+      "groupId": "admin",
+      "id": "admin",
+      "dbName": "go_admin_panel",
+      "host": "192.168.1.20",
+      "userName": "go",
+      "password": "go@github.com",
+      "maxIdleConnect": 10,
+      "maxOpenConnect": 30,
+      "logMode": true
+    }
+  ],
+  "redis": [
+    {
+      "id": "redis-1",
+      "host": "127.0.0.1",
+      "port": 6379,
+      "password": "",
+      "maxConnect": 10,
+      "maxIdleConnect": 10,
+      "minIdleConnect": 10
+    },
+    {
+      "id": "shared-redis-1",
+      "shared": true,
+      "host": "127.0.0.1",
+      "port": 6379,
+      "password": "",
+      "maxConnect": 10,
+      "maxIdleConnect": 10,
+      "minIdleConnect": 10
+    }
+  ],
+  "platform": {
+    "sandboxModel": true,
+    "hashSalt": "sj39j30-sj39",
+    "wechat": {
+    }
+  }
+}

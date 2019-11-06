@@ -1,0 +1,196 @@
+{{define "log/list2.html"}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>操作日志</title>
+    {{template "head.html"}}
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-list" data-type="batchdel">删除</button>
+            </div>
+            <table id="LAY-app-content-list" lay-filter="LAY-app-content-list"></table>
+            <script type="text/html" id="table-content-list">
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.config({
+        base: '/static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table'], function () { //use('contlist') 则会加载static/modules/的js文件
+        var table = layui.table
+            ,form = layui.form;
+
+        table.render({
+            elem: "#LAY-app-content-list",
+            url: "data",  //加载json数据
+            cols: [[
+                {
+                    type: "checkbox", fixed: "left"
+                }, {
+                    field: "id",
+                    width: 100,
+                    title: "操作ID",
+                    sort: !0
+                }, {
+                    field: "accountId",
+                    title: "用户ID",
+                    minWidth: 100
+                }, {
+                    field: "method",
+                    title: "执行方法"
+                }, {
+                    field: "path",
+                    title: "执行路径"
+                }, {
+                    field: "params",
+                    title: "请求参数"
+                }, {
+                    field: "ip",
+                    title: "访问ip"
+                }, {
+                    title: "操作",
+                    minWidth: 150,
+                    align: "center",
+                    fixed: "right",
+                    toolbar: "#table-content-list"
+            }]],
+            page: !0,
+            limit: 10,
+            limits: [10, 15, 20, 25, 30],
+            text: "对不起，加载出现异常！"
+        });
+
+        table.on("tool(LAY-app-content-list)", function (t) {
+            var e = t.data;
+            "del" === t.event ? layer.confirm("确定删除此文章？", function (e) {
+                t.del(), layer.close(e)
+            }) : "edit" === t.event && layer.open({
+                type: 2,
+                title: "编辑文章",
+                content: "../../../demo/app/content/listform.html?id=" + e.id,
+                maxmin: !0,
+                area: ["550px", "550px"],
+                btn: ["确定", "取消"],
+                yes: function (e, i) {
+                    var l = window["layui-layer-iframe" + e],
+                        a = i.find("iframe").contents().find("#layuiadmin-app-form-edit");
+                    l.layui.form.on("submit(layuiadmin-app-form-edit)", function (i) {
+                        var l = i.field;
+                        t.update({
+                            label: l.label,
+                            title: l.title,
+                            author: l.author,
+                            status: l.status
+                        }), n.render(), layer.close(e)
+                    }), a.trigger("click")
+                }
+            })
+        });
+
+        table.render({
+            elem: "#LAY-app-content-tags",
+            url: layui.setter.base + "json/content/tags.js",
+            cols: [[{type: "numbers", fixed: "left"}, {field: "id", width: 100, title: "ID", sort: !0}, {
+                field: "tags",
+                title: "分类名",
+                minWidth: 100
+            }, {title: "操作", width: 150, align: "center", fixed: "right", toolbar: "#layuiadmin-app-cont-tagsbar"}]],
+            text: "对不起，加载出现异常！"
+        });
+
+        table.on("tool(LAY-app-content-tags)", function (t) {
+            var i = t.data;
+            if ("del" === t.event) layer.confirm("确定删除此分类？", function (e) {
+                t.del(), layer.close(e)
+            }); else if ("edit" === t.event) {
+                e(t.tr);
+                layer.open({
+                    type: 2,
+                    title: "编辑分类",
+                    content: "../../../demo/app/content/tagsform.html?id=" + i.id,
+                    area: ["450px", "200px"],
+                    btn: ["确定", "取消"],
+                    yes: function (e, i) {
+                        var n = i.find("iframe").contents().find("#layuiadmin-app-form-tags"),
+                            l = n.find('input[name="tags"]').val();
+                        l.replace(/\s/g, "") && (t.update({tags: l}), layer.close(e))
+                    },
+                    success: function (t, e) {
+                        var n = t.find("iframe").contents().find("#layuiadmin-app-form-tags").click();
+                        n.find('input[name="tags"]').val(i.tags)
+                    }
+                })
+            }
+        });
+
+
+        //监听搜索
+        form.on('submit(LAY-app-contlist-search)', function(data){
+            var field = data.field;
+
+            //执行重载
+            table.reload('LAY-app-content-list', {
+                where: field
+            });
+        });
+
+        var $ = layui.$, active = {
+            batchdel: function(){
+                var checkStatus = table.checkStatus('LAY-app-content-list')
+                    ,checkData = checkStatus.data; //得到选中的数据
+
+                if(checkData.length === 0){
+                    return layer.msg('请选择数据');
+                }
+
+                layer.confirm('确定删除吗？', function(index) {
+
+                    //执行 Ajax 后重载
+                    /*
+                    admin.req({
+                      url: 'xxx'
+                      //,……
+                    });
+                    */
+                    table.reload('LAY-app-content-list');
+                    layer.msg('已删除');
+                });
+            },
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加文章'
+                    ,content: 'listform.html'
+                    ,maxmin: true
+                    ,area: ['550px', '550px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        //点击确认触发 iframe 内容中的按钮提交
+                        var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                        submit.click();
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.layuiadmin-btn-list').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
+
+</body>
+</html>
+{{end}}

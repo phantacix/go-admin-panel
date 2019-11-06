@@ -1,0 +1,40 @@
+{{define "home/main.html"}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>首页</title>
+    {{template "head.html"}}
+</head>
+<body class="layui-layout-body">
+
+<div id="LAY_app">
+    <div class="layui-layout layui-layout-admin">
+
+        {{template "home/top_menu.html" .}}
+        {{template "home/side_menu.html" .}}
+        {{template "home/page_tab.html"}}
+
+        <!-- 主体内容 -->
+        <div class="layui-body" id="LAY_app_body">
+            <div class="layadmin-tabsbody-item layui-show">
+                <iframe src="../home/console" frameborder="0" class="layadmin-iframe"></iframe>
+            </div>
+        </div>
+
+        <!-- 辅助元素，一般用于移动设备下遮罩 -->
+        <div class="layadmin-body-shade" layadmin-event="shade"></div>
+    </div>
+</div>
+
+<script>
+    layui.config({
+        base: '../static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use('index');
+</script>
+
+</body>
+
+</html>
+{{end}}
