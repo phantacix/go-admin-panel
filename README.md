@@ -11,10 +11,11 @@
 
 ## 调试&配置
 
+- 请确认本机已安装go 1.13+版本。
 - 打开goland，`File->Settings->Go->Go Modules(vgo)`，勾选`Enable Go Modules(vgo) integration`，设置`Proxy`为`https://goproxy.cn`
-- 从`misc->db_script`目录导入相关的db脚本到数据库。确认`config/env`的配置参数正确。
-- main.go默认读取`config/env/local` 的环境配置，如需自定义，请在`config/env`创建自己的环境目录。并且在`Debug Configurations/Program arguments`设置`-env=xxx`。
-- 开发时使用`gorm`的AutoMigrate功能更新数据库。可参照`module/admin/admin_test.go`中的`TestAdminDBMigrate()`编写脚本。
+- main.go默认读取`config/env/local/admin.json`配置文件。请确认`端口`可用，`mysql`结点的数据库、帐号和密码正确。
+- 如需自定义配置，请在`config/env`创建自己的环境目录。并且在`Debug Configurations/Program arguments`设置`-env=xxx`。
+- 创建数据库表结构。执行`module/admin/admin_test.go`中的`TestAdminDBMigrate()`函数即可创建表结构，或手工导入`misc/db_script/go_admin_panel.sql`文件。
 
 
 ## 模板引擎
