@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"github.com/phantacix/go-admin-panel/core"
 	"github.com/phantacix/go-admin-panel/core/db"
+	"strings"
 	"testing"
 )
 
 func init() {
 	core.Init("../../../config/env/local/admin.json")
+}
+
+func TestAccountTrim(t *testing.T) {
+	var accountName = " 11  "
+	accountName = strings.TrimSpace(accountName)
+	fmt.Print(accountName)
 }
 
 func TestAccountWithName(t *testing.T) {

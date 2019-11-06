@@ -1,6 +1,9 @@
 package model
 
-import "github.com/phantacix/go-admin-panel/core/db"
+import (
+	"github.com/phantacix/go-admin-panel/core/db"
+	"github.com/phantacix/go-admin-panel/core/logger"
+)
 
 type Log struct {
 	Id         int64  `gorm:"column:id;primary_key;auto_increment;comment:'日志自增id'" json:"id"`
@@ -16,23 +19,27 @@ func (*Log) TableName() string {
 	return "sys_log"
 }
 
-func LogPagination(page int, limit int) ([]*Log, int) {
-	offset := (page - 1) * limit
-	logs := make([]*Log, 0)
-	total := 0
-	db.AdminDB().Limit(limit).Offset(offset).Find(&logs).Count(&total)
-	return logs, total
-}
+func LogWithAccount(accountId int64, page int, pageSize int) ([]*Log, int) {
+	var logs = make([]*Log, 0)
+	var count int
 
-func LogDelete(id int) {
-	var log Log
-	db.AdminDB().Delete(&log, "id=?", id)
-}
+	if page < 1 {
+		page = 1
+	}
 
-func LogWithAccountName(accountName string, page int, limit int) ([]*Log, int) {
-	offset := (page - 1) * limit
-	logs := make([]*Log, 0)
-	total := 0
-	db.AdminDB().Where("accountName=?", accountName).Limit(limit).Offset(offset).Find(&logs).Count(&total)
-	return logs, total
+	if pageSize < 1 {
+		pageSize = 10
+	}
+
+	s := db.AdminDB().Limit(pageSize).Offset((page - 1) * pageSize)
+
+	if accountId > 0 {
+		s.Where("account_id=?", accountId)
+	}
+
+	if err := s.Find(&logs).Count(&count).Error; err != nil {
+		logger.Sugar.Error(err)
+	}
+
+	return logs, count
 }
