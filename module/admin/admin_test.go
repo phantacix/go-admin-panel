@@ -9,10 +9,11 @@ import (
 	"testing"
 )
 
+func init() {
+	core.Init("../../config/env/local/admin.json")
+}
+
 func TestAdminDBMigrate(t *testing.T) {
-
-	core.Init("../../../config/env/local/admin.json")
-
 	orm := db.AdminDB()
 
 	dept, log, menu, role, account := &model.Dept{}, &model.Log{}, &model.Menu{}, &model.Role{}, &model.Account{}
@@ -21,5 +22,4 @@ func TestAdminDBMigrate(t *testing.T) {
 	if err := orm.AutoMigrate(dept, log, menu, role, account).Error; err != nil {
 		fmt.Print(err)
 	}
-
 }

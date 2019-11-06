@@ -12,25 +12,19 @@ type LogController struct {
 
 func (l *LogController) Init(s *gin.Engine) {
 	logGroup := s.Group("/log")
-	logGroup.GET("/list", server.BuildHandle(l.List))
-	logGroup.GET("/data", server.BuildHandle(l.Data))
+	logGroup.GET("/list", server.BuildHandle(l.listPage))
+	logGroup.GET("/data", server.BuildHandle(l.data))
 }
 
-func (l *LogController) List(ctx *server.GinContext) {
+func (l *LogController) listPage(ctx *server.GinContext) {
 	ctx.HTML("log/list.html", "")
 }
 
-func (l *LogController) Data(ctx *server.GinContext) {
+func (l *LogController) data(ctx *server.GinContext) {
 	page := ctx.QueryInt("page", 0)
 	limit := ctx.QueryInt("limit", 10)
 	accountName := strings.TrimSpace(ctx.Query("accountName"))
 
-	var accountId int64
-
-	if len(accountName) > 0 {
-		accountId = model.AccountWithName(accountName).AccountId
-	}
-
-	logs, total := model.LogWithAccount(accountId, page, limit)
+	logs, total := model.LogPagination(accountName, page, limit)
 	ctx.Pagination(total, logs)
 }

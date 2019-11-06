@@ -44,9 +44,6 @@ func AccountWithId(accountId int64) *Account {
 }
 
 func AccountsWithDeptId(deptId int64, page, pageSize int) ([]*Account, int) {
-	var accounts = make([]*Account, 0)
-	var count int
-
 	if page < 1 {
 		page = 1
 	}
@@ -55,13 +52,20 @@ func AccountsWithDeptId(deptId int64, page, pageSize int) ([]*Account, int) {
 		pageSize = 10
 	}
 
-	s := db.AdminDB().Where("dept_id=?", deptId)
-	s = s.Limit(pageSize)
-	s = s.Offset((page - 1) * pageSize)
+	var accounts []*Account
+	var count int
 
-	if err := s.Find(&accounts).Count(&count).Error; err != nil {
-		logger.Sugar.Error(err)
+	db.AdminDB().Model(&Account{}).Where("dept_id=?", deptId).Count(&count)
+
+	if count > 0 {
+		accounts = make([]*Account, pageSize)
+
+		s := db.AdminDB().Limit(pageSize).Offset((page - 1) * pageSize)
+		if err := s.Find(&accounts).Error; err != nil {
+			logger.Sugar.Error(err)
+		}
 	}
+
 	return accounts, count
 }
 
