@@ -44,6 +44,8 @@ func Init() {
 		}
 		dbs[v.Id] = db
 	}
+
+	isInit = true
 }
 
 func GetDb(id string) *gorm.DB {
